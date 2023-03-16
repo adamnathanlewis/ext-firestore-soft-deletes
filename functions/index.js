@@ -40,14 +40,16 @@ exports.firestoreSoftDeletes = functions.firestore
       // We don't need to do anything else
       // This is to to allow hard deletes to be performed
       // by deleting the document once it has been soft deleted
-      if (deletedRecord.softDeletes.deletedAt) {
+      if (deletedRecord.softDeletes && deletedRecord.softDeletes.deletedAt) {
         return false;
       }
 
       // Set the deletedAt timestamp on the new record
-      deletedRecord.softDeletes.deletedAt = new Date();
-      deletedRecord.softDeletes.restored = false;
-      deletedRecord.softDeletes.restoredAt = null;
+      deletedRecord.softDeletes = {
+        deletedAt: new Date(),
+        restored: false,
+        restoredAt: null,
+      };
 
       // Finally, insert the document into the DeletedRecords collection
       await db.doc(path).set(deletedRecord);
@@ -62,6 +64,7 @@ exports.firestoreSoftDeletesRestore = functions.firestore
     .onUpdate(async (change, context) => {
       // get the newly edited document data
       const deletedRecord = change.after.data();
+      
       // get the document data from before it was edited
       const previousData = change.before.data();
 
@@ -72,7 +75,7 @@ exports.firestoreSoftDeletesRestore = functions.firestore
         const path = context.resource.name.split("DeletedRecords/DeletedRecords/")[1];
 
         // restore the original collection names by removing _archived from the end
-        const restorePath = path.replace("_archived", "");
+        const restorePath = path.replaceAll("_archived", "");
         
         // set the restoredAt timestamp
         deletedRecord.softDeletes.restoredAt = new Date();
@@ -82,6 +85,6 @@ exports.firestoreSoftDeletesRestore = functions.firestore
 
         // finally, insert the document back into the original collection
         await db.doc(restorePath).set(deletedRecord);
-        
+
       }
     });
