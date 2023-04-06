@@ -12,6 +12,14 @@ exports.firestoreSoftDeletes = functions.firestore
       // DeletedRecord = a copy of the originally deleted firestore document
       const deletedRecord = snap.data();
 
+      // If the deleted document already has a deletedAt timestamp,
+      // We don't need to do anything else
+      // This is to to allow hard deletes to be performed
+      // by deleting the document once it has been soft deleted
+      if (deletedRecord.softDeletes?.deletedAt) {
+        return false;
+      }
+
       // path = the firestore path of the deleted document
       let path = context.resource.name.split("/(default)/documents/")[1];
 
@@ -23,26 +31,14 @@ exports.firestoreSoftDeletes = functions.firestore
       // So we can get all the collection names by getting all the odd indexes
       // Then we can append _archived to the end of each collection name...
       // ready to insert into the DeletedRecords collection
-      for (let i = 0; i < splitPath.length; i++) {
-        if (i % 2 !== 1) {
-          // if the index is odd, (i.e. it's a collection name)
-          // update the collection name to append _archived
-          splitPath[i] = splitPath[i] + "_archived";
-        }
+      for (let i = 0; i < splitPath.length; i += 2) {
+        splitPath[i] = splitPath[i] + "_archived";  
       }
 
       // Create a path to the DeletedRecords collection and
       // append the original path to the end of it, maintaining the
       // original structure of the deleted document
       path = "DeletedRecords/DeletedRecords/" + splitPath.join("/");
-
-      // If the deleted document already has a deletedAt timestamp,
-      // We don't need to do anything else
-      // This is to to allow hard deletes to be performed
-      // by deleting the document once it has been soft deleted
-      if (deletedRecord.softDeletes && deletedRecord.softDeletes.deletedAt) {
-        return false;
-      }
 
       // Set the deletedAt timestamp on the new record
       deletedRecord.softDeletes = {
@@ -69,7 +65,7 @@ exports.firestoreSoftDeletesRestore = functions.firestore
       const previousData = change.before.data();
 
       // if the document's restored property was false and is now true
-      if (previousData.softDeletes.restored === false && deletedRecord.softDeletes.restored === true) {
+      if (previousData.softDeletes?.restored === false && deletedRecord.softDeletes?.restored === true) {
         // let's put the document back where it was before it was deleted!
         // get the path of the document, removing the DeletedRecords collection/document
         const path = context.resource.name.split("DeletedRecords/DeletedRecords/")[1];

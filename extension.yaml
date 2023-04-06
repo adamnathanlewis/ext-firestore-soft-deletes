@@ -46,7 +46,7 @@ resources:
     properties:
       # LOCATION is a user-configured parameter value specified by the user during installation.
       location: ${LOCATION}
-      runtime: "nodejs12"
+      runtime: "nodejs16"
       eventTrigger:
         eventType: providers/cloud.firestore/eventTypes/document.delete
         resource: projects/${PROJECT_ID}/databases/(default)/documents/{rootCollectionName}/{allPaths=**}
@@ -57,7 +57,7 @@ resources:
     properties:
       # LOCATION is a user-configured parameter value specified by the user during installation.
       location: ${LOCATION}
-      runtime: "nodejs12"
+      runtime: "nodejs16"
       eventTrigger:
         eventType: providers/cloud.firestore/eventTypes/document.update
         resource: projects/${PROJECT_ID}/databases/(default)/documents/DeletedRecords/DeletedRecords/{rootCollectionName}/{allPaths=**}
