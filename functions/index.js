@@ -4,18 +4,9 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 const db = admin.firestore();
 
-// Set default values for extension params
-let collectionPath = "{rootCollectionName}/{allPaths=**}";
-let deletedCollectionName = "DeletedRecords";
-
-// If the extension params have been set, use them
-if (process.env.COLLECTION_PATH) {
-  collectionPath = process.env.COLLECTION_PATH + "/{documentId}";
-}
-if (process.env.DELETED_COLLECTION_NAME) {
-  deletedCollectionName = process.env.DELETED_COLLECTION_NAME;
-}
-
+// Set values from extension params
+let collectionPath = process.env.COLLECTION_PATH + "/{documentId}";
+let deletedCollectionName = process.env.DELETED_COLLECTION_NAME;
 
 exports.firestoreSoftDeletes = functions.runWith({failurePolicy: true}).firestore
     // Set trigger to all paths

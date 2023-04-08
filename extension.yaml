@@ -1,6 +1,3 @@
-# Learn detailed information about the fields of an extension.yaml file in the docs:
-# https://firebase.google.com/docs/extensions/alpha/ref-extension-yaml
-
 name: ext-firestore-soft-deletes  # Identifier for your extension
 version: 0.0.1  # Follow semver versioning
 specVersion: v1beta  # Version of the Firebase Extensions specification
@@ -53,7 +50,7 @@ resources:
       runtime: "nodejs16"
       eventTrigger:
         eventType: providers/cloud.firestore/eventTypes/document.delete
-        resource: projects/${PROJECT_ID}/databases/(default)/documents/{rootCollectionName}/{allPaths=**}
+        resource: projects/${PROJECT_ID}/databases/(default)/documents/${COLLECTION_PATH}/{documentId}
   - name: firestoreSoftDeletesRestore
     type: firebaseextensions.v1beta.function
     description: >-
@@ -64,7 +61,7 @@ resources:
       runtime: "nodejs16"
       eventTrigger:
         eventType: providers/cloud.firestore/eventTypes/document.update
-        resource: projects/${PROJECT_ID}/databases/(default)/documents/DeletedRecords/DeletedRecords/{rootCollectionName}/{allPaths=**}
+        resource: projects/${PROJECT_ID}/databases/(default)/documents/${DELETED_COLLECTION_NAME}/${DELETED_COLLECTION_NAME}/${COLLECTION_PATH}/{documentId}
 
 # In the `params` field, set up your extension's user-configured parameters.
 # Learn more in the docs: https://firebase.google.com/docs/extensions/alpha/ref-extension-yaml#params-field
@@ -120,20 +117,25 @@ params:
     required: true
     immutable: true
   - param: COLLECTION_PATH
-    label: Collection (leave blank for all)
+    label: Collection (default is all collections)
     description: >-
-      Which collection do you want to use Soft Deletes on? e.g. "Users" or "Users/{userId}/Settings"
+      Which collection do you want to use Soft Deletes on? 
+      Choose the default ({AllCollections=**}) to cover all collections / subcollections.
+      Note: You can configure specific subcollections by using the syntax:
+      ExampleCollection/{docId}/ExampleSubCollection
     type: string
     validationRegex: ^\S+$
     validationErrorMessage: Firestore Collection path cannot contain spaces and must point to a collection, not a document.
     example: collection/{document}/subcollection
-    required: false
+    default: '{AllCollections=**}'
+    required: true
   - param: DELETED_COLLECTION_NAME
-    label: Collection name to store deleted documents (leave blank for default "DeletedRecords")
+    label: Collection name to store deleted documents
     description: >-
-      Specify the name for the collection where deleted documents will be stored e.g. "deleted_firestore_documents"
+      Specify the name for the collection where deleted documents will be stored
     type: string
     validationRegex: ^\S+$
     validationErrorMessage: Firestore Collection name cannot contain spaces.
     example: DeletedRecords
-    required: false
+    default: DeletedRecords
+    required: true
