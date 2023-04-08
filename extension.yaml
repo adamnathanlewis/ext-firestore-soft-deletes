@@ -122,7 +122,7 @@ params:
       Which collection do you want to use Soft Deletes on? 
       Choose the default ({AllCollections=**}) to cover all collections / subcollections.
       Note: You can configure specific subcollections by using the syntax:
-      ExampleCollection/{docId}/ExampleSubCollection
+      'ExampleCollection/{docId}/ExampleSubCollection'
     type: string
     validationRegex: ^\S+$
     validationErrorMessage: Firestore Collection path cannot contain spaces and must point to a collection, not a document.
