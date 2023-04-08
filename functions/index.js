@@ -4,9 +4,22 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 const db = admin.firestore();
 
-exports.firestoreSoftDeletes = functions.firestore
+// Set default values for extension params
+let collectionPath = "{rootCollectionName}/{allPaths=**}";
+let deletedCollectionName = "DeletedRecords";
+
+// If the extension params have been set, use them
+if (process.env.COLLECTION_PATH) {
+  collectionPath = process.env.COLLECTION_PATH + "/{documentId}";
+}
+if (process.env.DELETED_COLLECTION_NAME) {
+  deletedCollectionName = process.env.DELETED_COLLECTION_NAME;
+}
+
+
+exports.firestoreSoftDeletes = functions.runWith({failurePolicy: true}).firestore
     // Set trigger to all paths
-    .document("{rootCollectionName}/{allPaths=**}")
+    .document(collectionPath)
     // Set trigger to when a firestore document is deleted
     .onDelete(async (snap, context) => {
       // DeletedRecord = a copy of the originally deleted firestore document
@@ -38,7 +51,7 @@ exports.firestoreSoftDeletes = functions.firestore
       // Create a path to the DeletedRecords collection and
       // append the original path to the end of it, maintaining the
       // original structure of the deleted document
-      path = "DeletedRecords/DeletedRecords/" + splitPath.join("/");
+      path = `${deletedCollectionName}/${deletedCollectionName}/` + splitPath.join("/");
 
       // Set the deletedAt timestamp on the new record
       deletedRecord.softDeletes = {
@@ -53,9 +66,9 @@ exports.firestoreSoftDeletes = functions.firestore
     });
 
 
-exports.firestoreSoftDeletesRestore = functions.firestore
-    // set trigger to all paths
-    .document("DeletedRecords/DeletedRecords/{rootCollectionName}/{allPaths=**}")
+exports.firestoreSoftDeletesRestore = functions.runWith({failurePolicy: true}).firestore
+    // set trigger to path within the deleted records collection
+    .document(`${deletedCollectionName}/${deletedCollectionName}/{rootCollectionName}/{allPaths=**}`)
     // set trigger to when a firestore document is updated
     .onUpdate(async (change, context) => {
       // get the newly edited document data
@@ -68,7 +81,7 @@ exports.firestoreSoftDeletesRestore = functions.firestore
       if (previousData.softDeletes?.restored === false && deletedRecord.softDeletes?.restored === true) {
         // let's put the document back where it was before it was deleted!
         // get the path of the document, removing the DeletedRecords collection/document
-        const path = context.resource.name.split("DeletedRecords/DeletedRecords/")[1];
+        const path = context.resource.name.split(`${deletedCollectionName}/${deletedCollectionName}`)[1];
 
         // restore the original collection names by removing _archived from the end
         const restorePath = path.replaceAll("_archived", "");

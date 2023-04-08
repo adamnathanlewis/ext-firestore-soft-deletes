@@ -32,6 +32,9 @@ billingRequired: false
 # In an `apis` field, list any Google APIs (like Cloud Translation, BigQuery, etc.)
 # required for your extension to operate.
 # Learn more in the docs: https://firebase.google.com/docs/extensions/alpha/ref-extension-yaml#apis-field
+apis:
+  - apiName: firestore.googleapis.com
+    reason: This is required for the extension to operate
 
 # In a `roles` field, list any IAM access roles required for your extension to operate.
 # Learn more in the docs: https://firebase.google.com/docs/extensions/alpha/ref-extension-yaml#roles-field
@@ -115,4 +118,21 @@ params:
         value: australia-southeast1
     required: true
     immutable: true
-
+  - param: COLLECTION_PATH
+    label: Collection (leave blank for all)
+    description: >-
+      Which collection do you want to use Soft Deletes on? e.g. "Users" or "Users/{userId}/Settings"
+    type: string
+    validationRegex: ^\S+$
+    validationErrorMessage: Firestore Collection path cannot contain spaces and must point to a collection, not a document.
+    example: collection/{document}/subcollection
+    required: false
+  - param: DELETED_COLLECTION_NAME
+    label: Collection name to store deleted documents (leave blank for default "DeletedRecords")
+    description: >-
+      Specify the name for the collection where deleted documents will be stored e.g. "deleted_firestore_documents"
+    type: string
+    validationRegex: ^\S+$
+    validationErrorMessage: Firestore Collection name cannot contain spaces.
+    example: DeletedRecords
+    required: false
