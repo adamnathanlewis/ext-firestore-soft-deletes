@@ -2,13 +2,9 @@
 
 **Author**: Adam Lewis 
 
-**Description**: When firestore records are deleted, an exact copy of the deleted document is created in a separate collection.
+**Description**: 
 
-
-
-**Details**: ## Firestore Soft Deletes Extension
-
-Restore previously deleted Firestore documents with ease.
+This Firebase Extension allows you to restore previously deleted Firestore documents with ease.
 
 
 ## What does it do?
