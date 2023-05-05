@@ -35,7 +35,6 @@ This extension uses other Firebase or Google Cloud services which may have
 
 \*   Cloud Firestore  
 \*   Cloud Functions  
-\*   Cloud PubSub 
 
 When you use Firebase Extensions, you're only charged for the underlying  
 resources that you use. A paid-tier billing plan is only required if the  
