@@ -1,3 +1,7 @@
+## Version 0.0.3
+
+Update documentation
+
 ## Version 0.0.2
 
 Publish to Extensions Marketplace

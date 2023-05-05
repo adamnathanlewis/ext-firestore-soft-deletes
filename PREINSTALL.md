@@ -1,11 +1,6 @@
-## Firestore Soft Deletes Extension
-
 Restore previously deleted Firestore documents with ease.
 
-
-## What does it do?
-
-Imagine a Recycle Bin (Windows) or Bin (Mac) for your firestore documents. When you delete a firestore document (or an entire collection/subcollection of documents), the deleted document(s) will all safely be stored in a separate collection called `DeletedRecords` where you can see and most importantly, **restore** the document back into its original location.
+Imagine a Recycle Bin (Windows) or Bin (Mac) for your firestore documents. When you delete a firestore document (or an entire collection/subcollection of documents), the deleted document(s) will all safely be stored in a separate collection called `DeletedRecords` (this is configurable) where you can see and most importantly, **restore** the document back into its original location.
 
 ### View deleted documents:
 
