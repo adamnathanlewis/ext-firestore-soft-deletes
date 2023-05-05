@@ -1,5 +1,5 @@
 name: ext-firestore-soft-deletes  # Identifier for your extension
-version: 0.0.3  # Follow semver versioning
+version: 1.0.0  # Follow semver versioning
 specVersion: v1beta  # Version of the Firebase Extensions specification
 icon: icon.png
 

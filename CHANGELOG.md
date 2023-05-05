@@ -1,3 +1,7 @@
+## Version 1.0.0
+
+Full release to Extensions Marketplace
+
 ## Version 0.0.3
 
 Update documentation
